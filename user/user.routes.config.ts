@@ -12,6 +12,8 @@
  */
 
 import {CommonRoutesConfig} from '../common/common.routes.config';
+import UserController from './user.controller';
+import UserMiddleware from './user.middleware';
 import express from 'express';
 
 export class UserRoutes extends CommonRoutesConfig {
@@ -25,38 +27,29 @@ export class UserRoutes extends CommonRoutesConfig {
 	 */
 	configureRoutes() {
 		this.app.route(`/user`)
-			.get((req: express.Request, res: express.Response) => {
-				res.status(200).send(`List of user`);
-			})
-			.post((req: express.Request, res: express.Response) => {
-				res.status(200).send(`Post to user`);
-			});
+			.get(UserController.listUsers)
+			.post(
+				UserMiddleware.validateRequiredUserBodyFields,
+				UserMiddleware.validateSameEmailDoesntExist,
+				UserController.createUser);
 		
+		this.app.param(`userId`, UserMiddleware.extractUserId);
 		this.app.route(`/user/:userId`)
-			.all((req: express.Request, res: express.Response, next: express.NextFunction) => {
-				// this middleware function runs before any request to /user/:userId
-				// but it doesn't accomplish anything just yet---
-				// it simply passes control to the next applicable function below using next()
-				//
-				// This function will be beneficial when (later in the series) we create routes that are meant to be
-				// accessed only by authenticated users.
-				next();
-			})
-			// curl --location --request GET 'localhost:3000/user/12345'
-			.get((req: express.Request, res: express.Response) => {
-				res.status(200).send(`GET requested for id ${req.params.userId}`);
-			})
-			.put((req: express.Request, res: express.Response) => {
-				res.status(200).send(`PUT requested for id ${req.params.userId}`);
-			})
-			.patch((req: express.Request, res: express.Response) => {
-				res.status(200).send(`PATCH requested for id ${req.params.userId}`);
-			})
-			.delete((req: express.Request, res: express.Response) => {
-				res.status(200).send(`DELETE requested for id ${req.params.userId}`);
-			});
+			.all(UserMiddleware.validateUserExists)
+			.get(UserController.getUserById)
+			.delete(UserController.removeUser);
+		
+		this.app.put(`/user/:userId`,[
+			UserMiddleware.validateRequiredUserBodyFields,
+			UserMiddleware.validateSameEmailBelongToSameUser,
+			UserController.put
+		]);
+		
+		this.app.patch(`/user/:userId`, [
+			UserMiddleware.validatePatchEmail,
+			UserController.patch
+		]);
 		
 		return this.app;
 	}
-	
 }
