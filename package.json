@@ -7,6 +7,11 @@
   "repository": "git@github.com:RodrigoMattosoSilveira/chess-tournament-swiss.git",
   "license": "MIT",
   "private": false,
+  "scripts": {
+    "start": "tsc && node ./dist/app.js",
+    "debug": "export DEBUG=* && npm run start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "debug": "^4.3.1",
