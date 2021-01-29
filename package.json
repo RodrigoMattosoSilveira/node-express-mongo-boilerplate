@@ -1,0 +1,10 @@
+{
+  "name": "node-express-mongo-boilerplate",
+  "author": "Rodrigo Silveira",
+  "description": "Node / Express / MongoDB boilerplate project",
+  "version": "0.0.1",
+  "main": "index.ts",
+  "repository": "git@github.com:RodrigoMattosoSilveira/chess-tournament-swiss.git",
+  "license": "MIT",
+  "private": false
+}
